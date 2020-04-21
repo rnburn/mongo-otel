@@ -1,0 +1,32 @@
+version: '2'
+services:
+
+  database:
+    image: 'mongo'
+    container_name: 'my-mongo-container'
+    networks:
+      zoo_example:
+        aliases:
+          - database
+    environment:
+      - MONGO_INITDB_DATABASE=zoo
+      - MONGO_INITDB_ROOT_USERNAME=tiger
+      - MONGO_INITDB_ROOT_PASSWORD=meow
+    volumes:
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    ports:
+      - '5000:5000'
+
+  app-service:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    networks:
+      zoo_example:
+        aliases:
+          - app-service
+    command:
+      - /usr/bin/yes
+
+networks:
+  zoo_example: {}
