@@ -7,6 +7,10 @@ RUN apt-get update \
        golang \
        ca-certificates \
        git \
+  && go get go.opentelemetry.io/otel \
+  && go get github.com/apache/thrift/lib/go/thrift \
+  && go get google.golang.org/api/support/bundler \
   && go get go.mongodb.org/mongo-driver/mongo \
+  && go get go.opentelemetry.io/contrib/plugins/go.mongodb.org/mongo-driver \
   && cd /client \
   && go build

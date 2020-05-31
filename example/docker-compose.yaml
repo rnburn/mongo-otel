@@ -17,6 +17,17 @@ services:
     ports:
       - '5000:5000'
 
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "6831:6831/udp"
+      - "14268:14268"
+      - "16686:16686"
+    networks:
+      zoo_example:
+        aliases:
+          - jaeger
+
   app-service:
     build:
       context: .
@@ -29,6 +40,9 @@ services:
       - /client/client
     ports:
       - '8080:8080'
+    depends_on:
+      - jaeger
+      - database
 
 networks:
   zoo_example: {}
