@@ -71,40 +71,10 @@ func insertAnimal(name string) {
 func main() {
   fn := initTracer()
   defer fn()
-  tracer := global.Tracer("component-main")
-
-  ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-  opts := options.Client()
-  opts.Monitor = otelmongo.NewMonitor("mongo", otelmongo.WithTracer(tracer))
-  opts.ApplyURI("mongodb://tiger:meow@database:27017")
-  client, err := mongo.Connect(ctx, opts)
-  if err != nil {
-    log.Fatal(err)
-  }
-  err = client.Ping(ctx, readpref.Primary())
-  if err != nil {
-    fmt.Println("failed to connect")
-    log.Fatal(err)
-  }
-
-  collection := client.Database("zoo").Collection("animals")
-  _, err = collection.InsertOne(ctx, bson.D{{Key: "abc", Value: "123"}})
-  if err != nil {
-    fmt.Println("failed to insert")
-    log.Fatal(err)
-  }
 
   http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-    _, span := tracer.Start(ctx, "/")
-    defer span.End()
     name := r.URL.Path[1:]
     insertAnimal(name)
-    // collection = client.Database("zoo").Collection("animals")
-    // _, err = collection.InsertOne(ctx, bson.D{{Key: "abc", Value: "123"}})
-    // // _, err := collection.InsertOne(ctx, bson.M{"name": name})
-    // if err != nil {
-    //   log.Fatal(err)
-    // }
     fmt.Fprintf(w, "Inserting %s", name)
   })
   http.ListenAndServe(":8080", nil)
